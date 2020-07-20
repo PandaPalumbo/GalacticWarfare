@@ -6,9 +6,7 @@ var rot_y = 0
 func _process(delta):
 	movement()
 		
-	
-		
-	
+
 func _input(event):
 	
 		if event is InputEventMouseMotion and event.button_mask & 2:
