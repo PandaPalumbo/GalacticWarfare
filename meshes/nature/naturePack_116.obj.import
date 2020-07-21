@@ -1,0 +1,19 @@
+[remap]
+
+importer="wavefront_obj"
+type="Mesh"
+path="res://.import/naturePack_116.obj-d512c000cf6a412110f3c4bff2917457.mesh"
+
+[deps]
+
+files=[ "res://.import/naturePack_116.obj-d512c000cf6a412110f3c4bff2917457.mesh" ]
+
+source_file="res://meshes/nature/naturePack_116.obj"
+dest_files=[ "res://.import/naturePack_116.obj-d512c000cf6a412110f3c4bff2917457.mesh", "res://.import/naturePack_116.obj-d512c000cf6a412110f3c4bff2917457.mesh" ]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3( 1, 1, 1 )
+offset_mesh=Vector3( 0, 0, 0 )
+optimize_mesh=true

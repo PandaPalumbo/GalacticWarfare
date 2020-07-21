@@ -19,6 +19,10 @@ config/name="Galactic Warfare"
 run/main_scene="res://World.tscn"
 config/icon="res://icon.png"
 
+[autoload]
+
+DrawLine3d="*res://scripts/DrawLine3D.gd"
+
 [display]
 
 window/size/width=1920

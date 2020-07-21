@@ -11,7 +11,7 @@ var rot_y = 0
 var camera
 const ray_length = 1000
 var originOnSelect
-var moveDistance = 10
+var moveDistance = 6
 
 
 func _ready():
@@ -45,21 +45,22 @@ func _on_Unit_input_event(camera, event, click_position, click_normal, shape_idx
 
 func handleHighlight():
 	if isHighlighted and !canMove:
-		var children = $Unit.get_children()
+		var children = $CollisionShape/Unit.get_children()
 		for child in children:
 			if child.name == 'outline':
-				$Unit.remove_child(child)
+				$CollisionShape/Unit.remove_child(child)
 				isHighlighted = false
 	else:
 		originOnSelect = global_transform.origin
-		var mesh_outline = $Unit.mesh.create_outline(0.02)
+		var mesh_outline = $CollisionShape/Unit.mesh.create_outline(0.02)
 		var Outline = MeshInstance.new()
 		Outline.name = 'outline'
-		$Unit.add_child(Outline)
+		$CollisionShape/Unit.add_child(Outline)
 		Outline.set_mesh(mesh_outline)
 		var highlightMaterial = load("res://materials/highlight.tres")
 		Outline.set_surface_material(0, highlightMaterial)
 		isHighlighted = true
+		drawMovementArea()
 
 func handleRotation(event):
 	if isHighlighted:
@@ -92,6 +93,25 @@ func handleMove(event):
 				var hit = space_state.intersect_ray(from, to)
 				if hit.size() != 0:
 					var resultPos = Vector3(hit.position.x, global_transform.origin.y, hit.position.z)
-					global_transform.origin = resultPos
 					var distance = originOnSelect.distance_to(resultPos)
+					var distanceRay = space_state.intersect_ray(originOnSelect, resultPos)
+					if distance <= 6:
+						global_transform.origin = resultPos
+						
+#					DrawLine3d.DrawLine(originOnSelect, resultPos, Color(1,0,0), 2)
 					print("Distance: %s" % [distance])
+					
+
+func drawMovementArea():
+	var area = MeshInstance.new()
+	var sphere = SphereMesh.new()
+	sphere.radius = 8
+	sphere.height = .001
+	sphere = sphere.create_outline(0.02)
+	area.mesh = sphere
+	
+	self.get_parent().add_child(area)
+	area.global_transform.origin = $CollisionShape/Unit.global_transform.origin 
+	area.global_transform.origin.y -= 0.20
+	var highlightMaterial = load("res://materials/highlight.tres")
+	area.set_surface_material(0, highlightMaterial)
