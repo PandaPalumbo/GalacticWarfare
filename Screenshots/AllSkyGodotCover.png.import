@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/AllSkyFreeGodotScreenshot.png-320113016171915df1cf2d45e85756ae.stex"
+path="res://.import/AllSkyGodotCover.png-d78063828c077fd06c2443a0112574c8.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://AllSkyFreeGodotScreenshot.png"
-dest_files=[ "res://.import/AllSkyFreeGodotScreenshot.png-320113016171915df1cf2d45e85756ae.stex" ]
+source_file="res://Screenshots/AllSkyGodotCover.png"
+dest_files=[ "res://.import/AllSkyGodotCover.png-d78063828c077fd06c2443a0112574c8.stex" ]
 
 [params]
 
