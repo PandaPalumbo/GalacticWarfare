@@ -1,7 +1,7 @@
 extends RigidBody
 
 
-#params
+#mechanic params
 var isHighlighted = false
 var canRotate = false
 var canMove = false
@@ -13,11 +13,32 @@ var camera
 var floorMesh
 const ray_length = 1000
 var originOnSelect
-var moveDistance = 6.0
 var distanceLeft 
 var distanceTraveled = 0
 var playerPos
+
+#unit info
 var Mat
+var unitClass = {
+	"name": "Gilgamesh",
+	"faction": "heretics",
+	"hasMelee": true,
+	"hasRanged": true,
+	"hasMagic":true,
+	"powerLevel":150,
+	"rarity":"legendary",
+	"stats":{
+		"moveDistance":6,
+		"meleeSkill":10,
+		"rangedSkill":10,
+		"strength":10,
+		"toughness":10,
+		"health":10,
+	},
+	"abilities":[],
+	"weapons":[]
+}
+var moveDistance = unitClass.stats.moveDistance
 
 func _ready():
 	camera = get_node("../Player/Camera")
@@ -28,49 +49,42 @@ func _ready():
 	
 
 func _process(delta):
-	if isHighlighted:
-		if Input.is_action_pressed("rotate"):
-			canRotate = true
-		if Input.is_action_just_released("rotate"):
-			canRotate = false
+	pass
 
-
-func _input(event):
-	if canRotate:
-		handleRotation(event)
+func _input(event):	
 	if isHighlighted:
 		handleRaiseLower(event)
-#		if Input.is_action_pressed("moveUnit"):
-#			canMove = true
-#			handleMove(event)
-#		else:
-#			canMove = false
-#			playerPos = global_transform.origin
-#			distanceLeft = distanceLeft - distanceTraveled
-#			if distanceLeft <= 0:
-#				movementDone = true
+		handleRotation(event)
+		handleMove(event)
+	if Input.is_action_pressed("rotate"):
+		canRotate = true
+	if Input.is_action_just_released("rotate"):
+		canRotate = false
+	if Input.is_action_pressed("moveUnit"):
+		canMove = true
+	if Input.is_action_just_pressed("moveUnit"):
+		drawMovementArea()
+	if Input.is_action_just_released("moveUnit"):
+		canMove = false
+		hideMovmenetArea()
 
 func _on_Unit_input_event(camera, event, click_position, click_normal, shape_idx):
 	if event is InputEventMouseButton and event.button_mask & 1:
 		if event.is_pressed():
-			handleHighlight()		
-			if isHighlighted:
-				drawMovementArea()
+			handleHighlight()	
+				
 
 func handleHighlight():
 	playerPos = global_transform.origin
 	if isHighlighted and canMove == false:
 		var children = $Unit.get_children()
-		for child in children:
-			if child.name == 'outline':
-				$Unit.remove_child(child)
-				isHighlighted = false
-		stopMove()
+		$Unit.remove_child(children[0])
+		isHighlighted = false
+		hideMovmenetArea()
 	else:
 		originOnSelect = global_transform.origin
-		var mesh_outline = $Unit.mesh.create_outline(0.02)
+		var mesh_outline = $Unit.mesh.create_outline(0.05)
 		var Outline = MeshInstance.new()
-		Outline.name = 'outline'
 		$Unit.add_child(Outline)
 		Outline.set_mesh(mesh_outline)
 		var highlightMaterial = load("res://materials/highlight.tres")
@@ -79,7 +93,7 @@ func handleHighlight():
 		print('poop')
 		
 func handleRotation(event):
-	if isHighlighted:
+	if isHighlighted and canRotate:
 		if event is InputEventMouseMotion:
 			var rotation_speed = speed* 0.1
 			
@@ -116,11 +130,13 @@ func handleMove(event):
 						global_transform.origin = resultPos
 #					DrawLine3d.DrawLine(originOnSelect, resultPos, Color(1,0,0), 2)
 					print("Distance: %s" % [distance])
+			if event is InputEventMouseButton and Input.is_action_just_released("click"):
+				stopMove()
 
 func stopMove():
 	print('stopping movment ')
-	Mat = floorMesh.get_surface_material(0)
-	Mat.set_shader_param("alpha", 0)
+	distanceLeft -= distanceTraveled
+	playerPos = global_transform.origin
 	if distanceLeft <= 0:
 		movementDone = true
 
@@ -130,3 +146,6 @@ func drawMovementArea():
 	Mat.set_shader_param("unitPos", playerPos)
 	Mat.set_shader_param("R", distanceLeft)
 	Mat.set_shader_param("alpha", 1.0)
+func hideMovmenetArea():
+	Mat = floorMesh.get_surface_material(0)
+	Mat.set_shader_param("alpha", 0)
