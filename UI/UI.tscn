@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://fonts/Xolonium-Regular.otf" type="DynamicFontData" id=1]
+[ext_resource path="res://scripts/UI/UnitControlCont.gd" type="Script" id=2]
 
 [sub_resource type="DynamicFont" id=1]
 size = 40
@@ -14,6 +15,7 @@ margin_left = -1.68372
 margin_top = -3.36737
 margin_right = 1918.32
 margin_bottom = 1076.63
+script = ExtResource( 2 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -76,6 +78,7 @@ __meta__ = {
 }
 
 [node name="UnitControlCont" type="HBoxContainer" parent="."]
+visible = false
 anchor_top = 1.001
 anchor_bottom = 1.001
 margin_left = 42.8447
@@ -83,6 +86,7 @@ margin_top = -196.713
 margin_right = 446.845
 margin_bottom = -111.713
 rect_min_size = Vector2( 400, 50 )
+mouse_filter = 0
 alignment = 1
 __meta__ = {
 "_edit_use_anchors_": false
@@ -132,3 +136,51 @@ margin_bottom = 64.0
 rect_min_size = Vector2( 0, 30 )
 custom_fonts/font = SubResource( 2 )
 text = "Cancel (ESC)"
+
+[node name="TurnControlCont" type="HBoxContainer" parent="."]
+anchor_top = 1.001
+anchor_bottom = 1.001
+margin_left = 1474.0
+margin_top = -196.713
+margin_right = 1878.0
+margin_bottom = -111.713
+rect_min_size = Vector2( 400, 50 )
+alignment = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="LeftCont" type="VBoxContainer" parent="TurnControlCont"]
+margin_right = 200.0
+margin_bottom = 85.0
+grow_horizontal = 2
+rect_min_size = Vector2( 200, 85 )
+mouse_filter = 0
+alignment = 2
+
+[node name="CommanderSkill" type="Button" parent="TurnControlCont/LeftCont"]
+margin_top = 55.0
+margin_right = 200.0
+margin_bottom = 85.0
+rect_min_size = Vector2( 0, 30 )
+custom_fonts/font = SubResource( 2 )
+text = "Commander Skill (S)"
+
+[node name="RightCont" type="VBoxContainer" parent="TurnControlCont"]
+margin_left = 204.0
+margin_right = 404.0
+margin_bottom = 85.0
+grow_horizontal = 2
+rect_min_size = Vector2( 200, 85 )
+mouse_filter = 0
+alignment = 2
+
+[node name="EndTurn" type="Button" parent="TurnControlCont/RightCont"]
+margin_top = 55.0
+margin_right = 200.0
+margin_bottom = 85.0
+rect_min_size = Vector2( 0, 30 )
+custom_fonts/font = SubResource( 2 )
+text = "End Turn"
+[connection signal="pressed" from="UnitControlCont/RightCont/Move" to="." method="_on_Move_pressed"]
+[connection signal="pressed" from="UnitControlCont/RightCont/Cancel" to="." method="_on_Cancel_pressed"]

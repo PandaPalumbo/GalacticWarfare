@@ -30,6 +30,7 @@ fog_color = Color( 0, 0, 0, 1 )
 transform = Transform( 0.783215, 0, 0, 0, 0.783215, 0, 0, 0, 0.783215, 0, 0.519873, 0 )
 
 [node name="Player" parent="." instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 0.705043, -0.709165, 0, 0.709165, 0.705043, 0, 5.35551, -3.56053 )
 
 [node name="Ground" type="StaticBody" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.316678, 0 )
@@ -52,9 +53,16 @@ transform = Transform( 50, 0, 0, 0, 0.1, 0, 0, 0, 50, 0, 0, 0 )
 shape = SubResource( 4 )
 
 [node name="Unit" parent="." instance=ExtResource( 4 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.567614, 0 )
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource( 9 )
 
 [node name="UI" parent="." instance=ExtResource( 5 )]
 mouse_filter = 2
+[connection signal="disableMovment" from="Unit" to="UI" method="_on_Unit_disableMovment"]
+[connection signal="hideUI" from="Unit" to="UI" method="_on_Unit_hideUI"]
+[connection signal="isMoving" from="Unit" to="UI" method="_on_Unit_isMoving"]
+[connection signal="showUI" from="Unit" to="UI" method="_on_Unit_showUI"]
+[connection signal="cancelPressed" from="UI" to="Unit" method="_on_UI_cancelPressed"]
+[connection signal="movePressed" from="UI" to="Unit" method="_on_UI_movePressed"]
