@@ -2,11 +2,12 @@ extends RigidBody
 
 
 #mechanic params
+export var id = 1
 var isHighlighted = false
 var canRotate = false
 var canMove = false
 var movementDone = false
-var speed = 0.1
+export var speed = 0.1
 var rot_x = 0
 var rot_y = 0
 var camera
@@ -18,6 +19,7 @@ var distanceTraveled = 0
 var playerPos
 var moveButtonPressed = false
 var originalMovePos
+var player
 
 #signals
 signal showUI
@@ -53,6 +55,7 @@ var moveDistance = unitClass.stats.moveDistance
 func _ready():
 	camera = get_node("../Player/Camera")
 	floorMesh = get_node("../Ground/UnitMovement")
+	player = get_node("../Player")
 	if camera:
 		print(camera.name)
 	distanceLeft = moveDistance
@@ -93,7 +96,7 @@ func movePressed():
 		hideMovmenetArea()
 	
 func _on_Unit_input_event(camera, event, click_position, click_normal, shape_idx):
-	if event is InputEventMouseButton and event.button_mask & 1:
+	if event is InputEventMouseButton and event.button_mask & 1 and player.id == id:
 		if event.is_pressed():
 			handleSelect()	
 			
@@ -176,7 +179,7 @@ func stopMove():
 	distanceLeft -= distanceTraveled
 	distanceTraveled = 0
 	movementDone = true
-	emit_signal("disableMovment")
+	emit_signal("disableMovment", false)
 	
 
 func drawMovementArea():
@@ -200,6 +203,7 @@ func _on_UI_movePressed():
 		movePressed()
 		hideMovmenetArea()
 		stopMove()
+		moveButtonPressed = false
 
 
 func _on_UI_cancelPressed():

@@ -2,6 +2,7 @@ extends KinematicBody
 var speed = 0.1
 var rot_x = 0
 var rot_y = 0
+export var id = 1
 			
 func _process(delta):
 	movement()
