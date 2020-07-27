@@ -53,11 +53,11 @@ transform = Transform( 50, 0, 0, 0, 0.1, 0, 0, 0, 50, 0, 0, 0 )
 shape = SubResource( 3 )
 
 [node name="Unit" parent="." instance=ExtResource( 4 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.567614, 0 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.688153, 0 )
 
 [node name="Enemy" parent="." instance=ExtResource( 4 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.567614, 7.38968 )
-id = 2
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.688153, 7.38968 )
+playerId = 2
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource( 5 )
@@ -67,6 +67,7 @@ mouse_filter = 2
 [connection signal="disableMovment" from="Unit" to="UI" method="_on_Unit_disableMovment"]
 [connection signal="hideUI" from="Unit" to="UI" method="_on_Unit_hideUI"]
 [connection signal="isMoving" from="Unit" to="UI" method="_on_Unit_isMoving"]
+[connection signal="moveClicked" from="Unit" to="Enemy" method="_on_Unit_moveClicked"]
 [connection signal="showUI" from="Unit" to="UI" method="_on_Unit_showUI"]
 [connection signal="disableMovment" from="Enemy" to="UI" method="_on_Unit_disableMovment"]
 [connection signal="hideUI" from="Enemy" to="UI" method="_on_Unit_hideUI"]

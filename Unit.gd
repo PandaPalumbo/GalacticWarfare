@@ -2,7 +2,7 @@ extends RigidBody
 
 
 #mechanic params
-export var id = 1
+export var playerId = 1
 var isHighlighted = false
 var canRotate = false
 var canMove = false
@@ -26,6 +26,7 @@ signal showUI
 signal hideUI
 signal disableMovment
 signal isMoving
+signal moveClicked
 
 #unit info
 var Mat
@@ -96,7 +97,7 @@ func movePressed():
 		hideMovmenetArea()
 	
 func _on_Unit_input_event(camera, event, click_position, click_normal, shape_idx):
-	if event is InputEventMouseButton and event.button_mask & 1 and player.id == id:
+	if event is InputEventMouseButton and event.button_mask & 1 and player.id == playerId:
 		if event.is_pressed():
 			handleSelect()	
 			
@@ -110,27 +111,35 @@ func handleSelect():
 	if isHighlighted and canMove == false:
 		unSelect()
 	elif(!isHighlighted):
-		handleHighlight()
+		handleHighlight(null)
 		emit_signal("showUI")
 		
 func handleUnHighlight():
 	var children = $Mesh.get_children()
-	$Mesh.remove_child(children[0])
-	isHighlighted = false
-	hideMovmenetArea()
-	
-	
-func handleHighlight():
+	for child in children:
+		if child.name == "outline":
+			$Mesh.remove_child(child)
+			isHighlighted = false
+			if playerId == player.id:
+				hideMovmenetArea()
+
+func handleHighlight(isEnemy):
 	originOnSelect = global_transform.origin
 	var mesh_outline = $Mesh.mesh.create_outline(0.05)
 	var Outline = MeshInstance.new()
-	$Mesh.add_child(Outline)
-	Outline.set_mesh(mesh_outline)
-	var highlightMaterial = load("res://materials/highlight.tres")
-	Outline.set_surface_material(0, highlightMaterial)
-	isHighlighted = true
-	
-	print('Highlited Unit')
+	Outline.name = "outline"
+	if len($Mesh.get_children()) == 0:
+		$Mesh.add_child(Outline)
+		Outline.set_mesh(mesh_outline)
+		var highlightMaterial
+		if(!isEnemy):
+			highlightMaterial = load("res://materials/highlight.tres")
+		else:
+			highlightMaterial = load("res://materials/enemyHighlight.tres")
+		Outline.set_surface_material(0, highlightMaterial)
+		isHighlighted = true
+		
+		print('Highlited Unit')
 	
 func handleRotation(event):
 	if isHighlighted and canRotate:
@@ -154,7 +163,7 @@ func handleRaiseLower(event):
 					translate_object_local(Vector3(0,-1,0)*speed)
 
 func handleMove(event):
-	if !movementDone:
+	if !movementDone and playerId == player.id:
 			if event is InputEventMouseMotion and event.button_mask & 1:
 				var space_state = get_world().get_direct_space_state() 
 				var from = camera.project_ray_origin(event.position)
@@ -168,11 +177,10 @@ func handleMove(event):
 					var distanceRay = space_state.intersect_ray(originOnSelect, resultPos)	
 					if distance <= distanceLeft:
 						global_transform.origin = resultPos
-						
+						emit_signal("moveClicked", self)
 #					DrawLine3d.DrawLine(originOnSelect, resultPos, Color(1,0,0), 2)
 					print("Distance: %s" % [distance])
-			
-
+					
 
 func stopMove():
 	print('stopping movment ')
@@ -216,3 +224,16 @@ func _on_UI_cancelPressed():
 		
 	else:
 		unSelect()
+
+
+
+
+func _on_Unit_moveClicked(unit):
+	if unit.playerId != playerId:
+		print("Signal received from other unit")
+		var isInMeleeRange = unit.global_transform.origin.distance_to(global_transform.origin) <= 1
+		if isInMeleeRange:
+			handleHighlight(true)
+		else:
+			if isHighlighted:
+				handleUnHighlight()
