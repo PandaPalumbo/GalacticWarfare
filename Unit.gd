@@ -20,6 +20,7 @@ var playerPos
 var moveButtonPressed = false
 var originalMovePos
 var player
+var isMine
 
 #signals
 signal showUI
@@ -27,10 +28,11 @@ signal hideUI
 signal disableMovment
 signal isMoving
 signal moveClicked
-
+signal showTooltip
+signal hideTooltip
 #unit info
 var Mat
-var unitClass = {
+export var unitClass = {
 	"name": "Gilgamesh",
 	"avatar":"something.png",
 	"faction": "heretics",
@@ -41,15 +43,35 @@ var unitClass = {
 	"rarity":"legendary",
 	"stats":{
 		"moveDistance":6,
-		"meleeSkill":10,
-		"rangedSkill":10,
-		"strength":10,
-		"toughness":10,
-		"health":10,
+		"meleeSkill":50,
+		"rangedSkill":100,
+		"strength": 50,
+		"toughness": 50,
+		"health":30,
 		"actionPoints":3,
 	},
-	"abilities":[],
-	"weapons":[]
+	"passives":[],
+	"resistances":[],
+	"immunities":[],
+	"weaknesses":[],
+	"abilities":[
+		{
+			"id":0,
+			"name":"Fireball",
+			"actionPoints": 2,
+			"damage": 10,
+			"damageType":"Fire"
+		}
+	],
+	"weapons":[
+		{
+			"id":0,
+			"name":"Unarmed Attack",
+			"actionPoints": 2,
+			"damage": 10,
+			"damageType":"blunt"
+		}
+	]
 }
 var moveDistance = unitClass.stats.moveDistance
 
@@ -57,25 +79,37 @@ func _ready():
 	camera = get_node("../Player/Camera")
 	floorMesh = get_node("../Ground/UnitMovement")
 	player = get_node("../Player")
+	isMine = player.id == playerId
 	if camera:
 		print(camera.name)
 	distanceLeft = moveDistance
 	originalMovePos = playerPos
 
-func _process(delta):
-	pass
+
 
 func _input(event):	
-	if Input.is_action_pressed("rotate"):
+	if Input.is_action_pressed("rotate") and isMine:
 		canRotate = true
-	if Input.is_action_just_released("rotate"):
+	if Input.is_action_just_released("rotate") and isMine:
 		canRotate = false
 #	if Input.is_action_pressed("moveUnit"):
-	if Input.is_action_just_pressed("moveUnit") and !movementDone:
+	if Input.is_action_just_pressed("moveUnit") and !movementDone and isMine:
 		movePressed()
-#	if Input.is_action_just_pressed("click"):
+	if event is InputEventMouseMotion:
+		var space_state = get_world().get_direct_space_state() 
+		var from = camera.project_ray_origin(event.position)
+		var to = from + camera.project_ray_normal(event.position) * ray_length
+		var hit = space_state.intersect_ray(from, to)
+		if hit and hit.collider_id == self.get_instance_id():
+			print('hitting a unit')
+			if Input.is_action_pressed("shift") and !isHighlighted:
+				emit_signal("showTooltip", unitClass)
+			elif !isHighlighted:
+				emit_signal("hideTooltip")
+	if Input.is_action_just_released("shift") and  !isHighlighted:
+		emit_signal("hideTooltip")	
 		
-	if isHighlighted and canMove and !movementDone:
+	if isHighlighted and canMove and !movementDone and isMine:
 		handleMove(event)
 		handleRaiseLower(event)
 		handleRotation(event)
@@ -110,9 +144,13 @@ func handleSelect():
 	playerPos = global_transform.origin
 	if isHighlighted and canMove == false:
 		unSelect()
+		player.selectedUnit = null
+		emit_signal("hideTooltip")
 	elif(!isHighlighted):
 		handleHighlight(null)
+		player.selectedUnit = self
 		emit_signal("showUI")
+		emit_signal("showTooltip", unitClass)
 		
 func handleUnHighlight():
 	var children = $Mesh.get_children()
@@ -120,7 +158,7 @@ func handleUnHighlight():
 		if child.name == "outline":
 			$Mesh.remove_child(child)
 			isHighlighted = false
-			if playerId == player.id:
+			if isMine:
 				hideMovmenetArea()
 
 func handleHighlight(isEnemy):
@@ -163,7 +201,7 @@ func handleRaiseLower(event):
 					translate_object_local(Vector3(0,-1,0)*speed)
 
 func handleMove(event):
-	if !movementDone and playerId == player.id:
+	if !movementDone and isMine:
 			if event is InputEventMouseMotion and event.button_mask & 1:
 				var space_state = get_world().get_direct_space_state() 
 				var from = camera.project_ray_origin(event.position)
@@ -226,8 +264,6 @@ func _on_UI_cancelPressed():
 		unSelect()
 
 
-
-
 func _on_Unit_moveClicked(unit):
 	if unit.playerId != playerId:
 		print("Signal received from other unit")
@@ -237,3 +273,10 @@ func _on_Unit_moveClicked(unit):
 		else:
 			if isHighlighted:
 				handleUnHighlight()
+
+
+func _on_Unit_mouse_entered():
+	if Input.is_action_just_pressed("shift") and !isHighlighted:
+		emit_signal("showTooltip", unitClass)
+	if Input.is_action_just_released("shift") and !isHighlighted:
+		emit_signal("hideTooltip")	

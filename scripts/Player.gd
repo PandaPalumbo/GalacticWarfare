@@ -3,6 +3,8 @@ var speed = 0.1
 var rot_x = 0
 var rot_y = 0
 export var id = 1
+var isUnitSelected = false
+var selectedUnit = null
 			
 func _process(delta):
 	movement()
@@ -39,3 +41,11 @@ func movement():
 	
 	if Input.is_action_pressed("move_down"):
 		translate_object_local(Vector3(0,-1,0)*speed)
+
+
+func _on_Unit_showUI():
+	isUnitSelected = true
+
+
+func _on_Unit_hideUI():
+	isUnitSelected = false

@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=2]
+[gd_scene load_steps=17 format=2]
 
 [ext_resource path="res://materials/brickOrange/brick.tres" type="Material" id=1]
 [ext_resource path="res://classes/Player/Player.tscn" type="PackedScene" id=2]
@@ -6,6 +6,10 @@
 [ext_resource path="res://classes/Units/Unit.tscn" type="PackedScene" id=4]
 [ext_resource path="res://UI/UI.tscn" type="PackedScene" id=5]
 [ext_resource path="res://materials/shaders/highlight_gorund.tres" type="Material" id=6]
+[ext_resource path="res://materials/concrete_hd/concrete_height.png" type="Texture" id=7]
+[ext_resource path="res://media/orcicon.png" type="Texture" id=8]
+[ext_resource path="res://fonts/Xolonium-Regular.otf" type="DynamicFontData" id=9]
+[ext_resource path="res://Tooltip.gd" type="Script" id=10]
 
 [sub_resource type="PhysicsMaterial" id=1]
 
@@ -25,6 +29,10 @@ ambient_light_color = Color( 1, 1, 1, 1 )
 ambient_light_energy = 0.77
 ambient_light_sky_contribution = 0.0
 fog_color = Color( 0, 0, 0, 1 )
+
+[sub_resource type="DynamicFont" id=6]
+size = 200
+font_data = ExtResource( 9 )
 
 [node name="World" type="Spatial"]
 transform = Transform( 0.783215, 0, 0, 0, 0.783215, 0, 0, 0, 0.783215, 0, 0.519873, 0 )
@@ -58,17 +66,154 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.688153, 0 )
 [node name="Enemy" parent="." instance=ExtResource( 4 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.688153, 7.38968 )
 playerId = 2
+unitClass = {
+"abilities": [ {
+"actionPoints": 2,
+"damage": 10,
+"damageType": "Fire",
+"id": 0,
+"name": "Fireball"
+} ],
+"avatar": "something.png",
+"faction": "heretics",
+"hasMagic": true,
+"hasMelee": true,
+"hasRanged": true,
+"immunities": [  ],
+"name": "Enemy",
+"passives": [  ],
+"powerLevel": 150,
+"rarity": "legendary",
+"resistances": [  ],
+"stats": {
+"actionPoints": 3,
+"health": 30,
+"meleeSkill": 50,
+"moveDistance": 6,
+"rangedSkill": 100,
+"strength": 50,
+"toughness": 50
+},
+"weaknesses": [  ],
+"weapons": [ {
+"actionPoints": 2,
+"damage": 10,
+"damageType": "blunt",
+"id": 0,
+"name": "Unarmed Attack"
+} ]
+}
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource( 5 )
 
 [node name="UI" parent="." instance=ExtResource( 5 )]
+margin_left = 5.87573
+margin_top = -8.26141
+margin_right = 1925.88
+margin_bottom = 1071.74
 mouse_filter = 2
+
+[node name="Tooltip" type="Control" parent="."]
+visible = false
+margin_left = 14.0
+margin_top = 243.0
+margin_right = 242.0
+margin_bottom = 506.0
+script = ExtResource( 10 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="Tooltip"]
+margin_right = 2203.0
+margin_bottom = 2738.0
+rect_scale = Vector2( 0.1, 0.1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextureRect" type="TextureRect" parent="Tooltip/CenterContainer"]
+margin_left = 77.0
+margin_top = 345.0
+margin_right = 2125.0
+margin_bottom = 2393.0
+texture = ExtResource( 7 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Tooltip/CenterContainer"]
+margin_left = 224.0
+margin_top = 441.0
+margin_right = 1978.0
+margin_bottom = 2296.0
+alignment = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextureRect" type="TextureRect" parent="Tooltip/CenterContainer/VBoxContainer"]
+margin_right = 1754.0
+margin_bottom = 512.0
+texture = ExtResource( 8 )
+stretch_mode = 4
+
+[node name="UnitName" type="Label" parent="Tooltip/CenterContainer/VBoxContainer"]
+margin_top = 516.0
+margin_right = 1754.0
+margin_bottom = 736.0
+custom_fonts/font = SubResource( 6 )
+text = "Test"
+align = 1
+valign = 1
+
+[node name="HP" type="Label" parent="Tooltip/CenterContainer/VBoxContainer"]
+margin_top = 740.0
+margin_right = 1754.0
+margin_bottom = 960.0
+custom_fonts/font = SubResource( 6 )
+text = "HP: 100"
+align = 1
+valign = 1
+
+[node name="AP" type="Label" parent="Tooltip/CenterContainer/VBoxContainer"]
+margin_top = 964.0
+margin_right = 1754.0
+margin_bottom = 1184.0
+custom_fonts/font = SubResource( 6 )
+text = "AP: 3"
+align = 1
+valign = 1
+
+[node name="Speed" type="Label" parent="Tooltip/CenterContainer/VBoxContainer"]
+margin_top = 1188.0
+margin_right = 1754.0
+margin_bottom = 1408.0
+custom_fonts/font = SubResource( 6 )
+text = "Speed: 6"
+align = 1
+valign = 1
+
+[node name="Stats" type="Label" parent="Tooltip/CenterContainer/VBoxContainer"]
+margin_top = 1412.0
+margin_right = 1754.0
+margin_bottom = 1855.0
+custom_fonts/font = SubResource( 6 )
+text = "MS: 50, RS: 50
+S: 50, T: 50"
+align = 1
+valign = 1
 [connection signal="disableMovment" from="Unit" to="UI" method="_on_Unit_disableMovment"]
+[connection signal="hideTooltip" from="Unit" to="Tooltip" method="_on_Unit_hideTooltip"]
 [connection signal="hideUI" from="Unit" to="UI" method="_on_Unit_hideUI"]
+[connection signal="hideUI" from="Unit" to="Player" method="_on_Unit_hideUI"]
 [connection signal="isMoving" from="Unit" to="UI" method="_on_Unit_isMoving"]
+[connection signal="mouse_entered" from="Unit" to="Unit" method="_on_Unit_mouse_entered"]
 [connection signal="moveClicked" from="Unit" to="Enemy" method="_on_Unit_moveClicked"]
+[connection signal="showTooltip" from="Unit" to="Tooltip" method="_on_Unit_showTooltip"]
 [connection signal="showUI" from="Unit" to="UI" method="_on_Unit_showUI"]
+[connection signal="showUI" from="Unit" to="Player" method="_on_Unit_showUI"]
 [connection signal="disableMovment" from="Enemy" to="UI" method="_on_Unit_disableMovment"]
 [connection signal="hideUI" from="Enemy" to="UI" method="_on_Unit_hideUI"]
 [connection signal="isMoving" from="Enemy" to="UI" method="_on_Unit_isMoving"]
