@@ -10,8 +10,7 @@ var movementDone = false
 export var speed = 0.1
 var rot_x = 0
 var rot_y = 0
-var camera
-var floorMesh
+
 const ray_length = 1000
 var originOnSelect
 var distanceLeft 
@@ -21,6 +20,14 @@ var moveButtonPressed = false
 var originalMovePos
 var player
 var isMine
+var grid_position = Vector3(0, 0, 0)
+const GRID_SIZE = 1.0
+
+#external objects
+var Mat
+var camera
+var floorMesh
+var gridMap
 
 #signals
 signal showUI
@@ -30,8 +37,9 @@ signal isMoving
 signal moveClicked
 signal showTooltip
 signal hideTooltip
+
 #unit info
-var Mat
+
 export var unitClass = {
 	"name": "Gilgamesh",
 	"avatar":"something.png",
@@ -73,18 +81,24 @@ export var unitClass = {
 		}
 	]
 }
+
+
 var moveDistance = unitClass.stats.moveDistance
 
 func _ready():
 	camera = get_node("../Player/Camera")
-	floorMesh = get_node("../Ground/UnitMovement")
+	floorMesh = get_node("../GridMap/Ground/UnitMovement")
+	gridMap = get_node('../GridMap')
 	player = get_node("../Player")
 	isMine = player.id == playerId
 	if camera:
 		print(camera.name)
 	distanceLeft = moveDistance
 	originalMovePos = playerPos
-
+	#	global_transform.origin = grid_position * GRID_SIZE
+	# to move the character in the grid:
+#    grid_position.x += 1
+#    global_transform.origin = grid_position * GRID_SIZE
 
 
 func _input(event):	
@@ -96,16 +110,18 @@ func _input(event):
 	if Input.is_action_just_pressed("moveUnit") and !movementDone and isMine:
 		movePressed()
 	if event is InputEventMouseMotion:
+		
 		var space_state = get_world().get_direct_space_state() 
 		var from = camera.project_ray_origin(event.position)
 		var to = from + camera.project_ray_normal(event.position) * ray_length
 		var hit = space_state.intersect_ray(from, to)
 		if hit and hit.collider_id == self.get_instance_id():
-			print('hitting a unit')
+			#print('hitting a unit')
 			if Input.is_action_pressed("shift") and !isHighlighted:
 				emit_signal("showTooltip", unitClass)
 			elif !isHighlighted:
 				emit_signal("hideTooltip")
+				
 	if Input.is_action_just_released("shift") and  !isHighlighted:
 		emit_signal("hideTooltip")	
 		
@@ -280,3 +296,12 @@ func _on_Unit_mouse_entered():
 		emit_signal("showTooltip", unitClass)
 	if Input.is_action_just_released("shift") and !isHighlighted:
 		emit_signal("hideTooltip")	
+
+# some helper functions (optional):
+func world_position_to_grid_position(p_world_position):
+	return (p_world_position / GRID_SIZE).round()
+func grid_position_to_world_position(p_grid_position):
+	return p_grid_position * GRID_SIZE  
+func move_node_in_grid(p_offset):
+	grid_position += p_offset
+	global_transform.origin = grid_position_to_world_position(grid_position)

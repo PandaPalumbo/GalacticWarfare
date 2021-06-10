@@ -26,4 +26,4 @@ ao_on_uv2 = false
 ao_texture_channel = 4
 subsurf_scatter_enabled = true
 subsurf_scatter_strength = 0.1
-uv1_scale = Vector3( 100, 50, 1 )
+uv1_scale = Vector3( 250, 250, 1 )
